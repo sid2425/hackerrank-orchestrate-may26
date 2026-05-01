@@ -31,3 +31,9 @@ data/index/
 data/embeddings/
 *.sqlite
 *.db
+
+# agent LLM response cache
+code/.llm_cache.json
+
+# claude code internals
+.claude/

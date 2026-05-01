@@ -1,0 +1,32 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_models:/root/.ollama
+    ports:
+      - "11434:11434"
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  agent:
+    build:
+      context: ./code
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-phi3}
+      - DATA_DIR=/data
+      - SUPPORT_DIR=/support_tickets
+    volumes:
+      - ./data:/data:ro
+      - ./support_tickets:/support_tickets
+    working_dir: /app
+    command: python main.py
+
+volumes:
+  ollama_models:
